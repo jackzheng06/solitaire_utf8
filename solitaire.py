@@ -4,16 +4,22 @@ class SolitaireByteEncryptor():
     def __init__(self):
         pass
     
+    def __str__(self):
+        pass
+    
     def set_deck(self, deck):
         ''' (SolitaireDeck) -> NoneType
-        Set deck for encryption and decryption
+        Set deck for encryption and decryption.
+        设置一个加密用卡牌牌组。
         '''
         self.deck = deck
         
     def get_next_value(self, deck):
         ''' (list of int) -> int
         Get the next value of the deck (does not need to be valid).
-        This method will mutate the lsit. This function does not return anything
+        This method will mutate the list.
+        获取下一个密匙流数据（不需要有效）。
+        这个方法将修改牌组。
         '''
         deck.move_jokers()
         deck.triple_cut()
@@ -23,7 +29,9 @@ class SolitaireByteEncryptor():
     def get_next_keystream_value(self, deck):
         ''' (list of int) -> int
         Get the next valid value of the deck (keystream value)
-        This method will mutate the lsit. This function does not return anything
+        This method will mutate the list.
+        获取下一个有效密匙流数据。
+        这个方法将修改牌组。
         '''
         val = deck.joker1
         while val == deck.joker1 or val == deck.joker2:
@@ -31,6 +39,10 @@ class SolitaireByteEncryptor():
         return val
     
     def encrypt(self, byte):
+        ''' (byte) -> str
+        Encrypt one byte.
+        加密一个Byte。
+        '''
         hex_msg = hex(byte)[2:].upper()
         encrypted = ""
         char_map = "0123456789ABCDEF"
@@ -40,6 +52,10 @@ class SolitaireByteEncryptor():
         return encrypted
     
     def decrypt(self, byte):
+        ''' (str) -> byte
+        Decrypt one byte
+        解密一个Byte。
+        '''
         decrypted = ""
         char_map = "0123456789ABCDEF"
         for c in byte:
@@ -157,12 +173,17 @@ class SolitaireUTF8():
     
     def set_deck(self, deck):
         ''' (SolitaireDeck) -> NoneType
-        Set deck for encryption and decryption
+        Set deck for encryption and decryption.
+        设置加密／解密用牌组。
         '''
         self.deck = deck
         self.byte_encryptor.set_deck(deck)
     
     def encrypt(self, message):
+        ''' (str) -> str
+        Encrypt a string.
+        加密一个字符串。
+        '''
         message = bytes(message, "utf-8")
         encrypted = ""
         for b in message:
@@ -170,6 +191,10 @@ class SolitaireUTF8():
         return encrypted
     
     def decrypt(self, message):
+        ''' (str) -> str
+        Decrypt a string
+        解密一个字符串。
+        '''
         byte_list = []
         while message:
             byte_list.append(message[:2])
@@ -180,16 +205,18 @@ class SolitaireUTF8():
         decrypted = bytearray(decrypted)
         decrypted = decrypted.decode("utf-8")
         return decrypted
-
+    
+''' This part is for testing only
 # Generate a deck based on password, set jokers to be 51 and 52
-deck = SolitaireDeck("this is a really good password", 51, 52)
+deck = SolitaireDeck("password", 51, 52)
 
 # Initialize encryptor
 encryptor = SolitaireUTF8()
 encryptor.set_deck(deck)
 
-encrypted = encryptor.encrypt("myname")
+encrypted = encryptor.encrypt("代码是什么东西")
 
 deck.reset()
 
 decrypted = encryptor.decrypt(encrypted)
+'''
